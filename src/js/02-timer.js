@@ -55,8 +55,6 @@ function updateTimer() {
     };
 }
 
-let intervalId;
-
 startBtn.addEventListener("click", () => {
     const currentDate = new Date();
     const selectedDate = fp.selectedDates[0];
@@ -66,5 +64,5 @@ startBtn.addEventListener("click", () => {
         startBtn.classList.add('js-main-button')
         return;
     }
-    intervalId = setInterval(updateTimer, 1000);
+    setInterval(updateTimer, 1000);
 });
