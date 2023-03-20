@@ -12,21 +12,21 @@ function hendleStartCreatePromise(e) {
   let secondStep = firstDelay;
 
   for (let num = 1; num <= amount; num += 1) {
-    const promise = new Promise((resolve, reject) => {
-      debugger
-      const shouldResolve = Math.random() > 0.3;
-
-      setTimeout(() => {
-        if (shouldResolve) {
-          resolve()
-        } else {
-          reject()
-        }
-      }, secondStep)
-    });
-    promise
-      .then(() => Notify.success(`✅ Fulfilled promise ${num} in ${secondStep}ms`))
-      .catch(() => Notify.failure(`❌ Rejected promise ${num} in ${secondStep}ms`));
+    const promise = (num, secondStep) => {
+      return new Promise((resolve, reject) => {
+        const shouldResolve = Math.random() > 0.3;
+        setTimeout(() => {
+          if (shouldResolve) {
+            resolve(`✅ Fulfilled promise ${num} in ${secondStep}ms`)
+          } else {
+            reject(`❌ Rejected promise ${num} in ${secondStep}ms`)
+          }
+        }, secondStep)
+      })
+    };
+    promise(num, secondStep)
+      .then((answer) => Notify.success(answer))
+      .catch((answer) => Notify.failure(answer));
     secondStep += stepDelay;
   }
 };
