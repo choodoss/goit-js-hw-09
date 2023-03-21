@@ -9,6 +9,11 @@ const startBtn = document.querySelector("[data-start]");
 startBtn.disabled = true;
 startBtn.classList.add('js-main-button')
 
+const daysEl = document.querySelector("[data-days]");
+const hoursEl = document.querySelector("[data-hours]");
+const minutesEl = document.querySelector("[data-minutes]");
+const secondsEl = document.querySelector("[data-seconds]");
+
 const myInput = document.querySelector(".myInput");
 const fp = flatpickr(myInput, {
     locale: Ukrainian,//додав Українську))
@@ -22,7 +27,10 @@ const fp = flatpickr(myInput, {
     time_24hr: true,
     defaultDate: new Date(),
     minuteIncrement: 1,
-    onClose() {
+    onClose(selectedDates) {
+        if (selectedDates[0] < new Date()) {
+            return Notiflix.Report.failure('Ой, а що сталося?', 'ви обрали не валідну дату!');
+        }
         startBtn.classList.remove('js-main-button')
         startBtn.disabled = false;
     },
@@ -31,10 +39,6 @@ const fp = flatpickr(myInput, {
 function updateTimer() {
     const currentDate = new Date();
     const selectedDate = fp.selectedDates[0];
-    const daysEl = document.querySelector("[data-days]");
-    const hoursEl = document.querySelector("[data-hours]");
-    const minutesEl = document.querySelector("[data-minutes]");
-    const secondsEl = document.querySelector("[data-seconds]");
 
     const totalSeconds = Math.floor(((selectedDate.getTime() - currentDate.getTime()) / 1000));
     const days = Math.floor(totalSeconds / 86400);
@@ -42,27 +46,26 @@ function updateTimer() {
     const minutes = Math.floor((totalSeconds % 3600) / 60);
     const seconds = Math.floor(totalSeconds % 60);
 
-    daysEl.textContent = days < 10 ? `0${days}` : days;
-    hoursEl.textContent = hours < 10 ? `0${hours}` : hours;
-    minutesEl.textContent = minutes < 10 ? `0${minutes}` : minutes;
-    secondsEl.textContent = seconds < 10 ? `0${seconds}` : seconds;
+    daysEl.textContent = days.toString().padStart(2, '0');
+    hoursEl.textContent = hours.toString().padStart(2, '0');
+    minutesEl.textContent = minutes.toString().padStart(2, '0');
+    secondsEl.textContent = seconds.toString().padStart(2, '0');
 
-    if (daysEl.textContent === '00' && hoursEl.textContent === '00' && minutesEl.textContent === '00' && secondsEl.textContent === '00') {
+    if (totalSeconds === 0) {
+        myInput.disabled = false;
+        myInput.classList.remove('js-main-button')
         clearInterval(intervalId);
-        startBtn.disabled = true;
-        startBtn.classList.add('js-main-button')
         return;
     };
 }
 
+let intervalId;
+
 startBtn.addEventListener("click", () => {
-    const currentDate = new Date();
-    const selectedDate = fp.selectedDates[0];
-    if (selectedDate < currentDate) {
-        Notiflix.Report.failure('Ой, а що сталося?', 'ви обрали не валідну дату!');
-        startBtn.disabled = true;
-        startBtn.classList.add('js-main-button')
-        return;
-    }
-    setInterval(updateTimer, 1000);
+    intervalId = setInterval(updateTimer, 1000);
+
+    myInput.disabled = true;
+    myInput.classList.add('js-main-button')
+    startBtn.disabled = true;
+    startBtn.classList.add('js-main-button')
 });
